@@ -1,0 +1,40 @@
+{
+  "author": "Van Carney <carney.van@gmail.com>",
+  "name": "ezcake",
+  "description": "Cakefile Generator and Dependancy Manager",
+  "version": "0.7",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "github.com/webfreshener/ezcake.git"
+  },
+  "dependencies": {
+    "coffee-script": "~1.4.0",
+    "universal-jst": "~1.0.4",
+    "supervisor": "~0.5.0",
+    "commander":"~1.1.1",
+    "which":"~1.0.5"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.4.0",
+    "underscore": "~1.4.2",
+    "async":"~0.2.8", 
+    "commander":"~1.1.1",
+    "mocha": "~1.8.1",
+    "chai": "~1.4.2",
+    "docco": "~0.4.0",
+    "which":"~1.0.5"
+  },
+  "homepage": "http://www.ezcakejs.com",
+  "scripts": {
+    "test": "cake test"
+  },
+  "bin": {
+    "ezcake": "./bin/ezcake"
+  }
+}

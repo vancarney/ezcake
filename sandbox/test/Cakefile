@@ -1,0 +1,172 @@
+# Another Cakefile made with love by ezcake v0.7
+# require Node::FS
+fs = require 'fs'
+# require Node::Util
+{print} = require 'util'
+# import Spawn and Exec from child_process
+{spawn, exec}=require 'child_process'
+# try to import the Which module
+try
+  which = require('which').sync
+catch err
+  if process.platform.match(/^win/)?
+    console.warn 'The which module is required for windows. try "npm install which"'
+  which = null
+
+# paths object for module invocation reference
+paths={
+  "release": [
+    "debug",
+    "www"
+  ],
+  "assets": [
+    "src/assets",
+    "debug"
+  ],
+  "coffee": [
+    "debug/js",
+    "src/coffee"
+  ],
+  "uglify": [
+    "www"
+  ],
+  "less": [
+    "src/less",
+    "debug/css"
+  ],
+  "jade": [
+    "src/jade",
+    "debug",
+    "src/jade/templates",
+    "src/jade/include"
+  ],
+  "jst": [
+    "src/jst",
+    "debug/js"
+  ]
+}
+# file extensions for watching
+exts='coffee|jade|js'
+# Begin Callback Handlers
+# Callback From 'coffee'
+coffeeCallback=()->
+
+# Callback From 'docco'
+doccoCallback=()->
+
+# Begin Tasks
+# ## *build*
+# Compiles Sources
+task 'build', 'Compiles Sources', ()-> build -> log ':)', green
+build = ()->
+  # From Command 'assets'
+  #  Copies Assets from src directory in build directory 
+  exec "cp -r (#{paths.assets[0]}) (#{paths.assets[1]} )" if paths? and paths.assets?
+  # From Module 'coffee'
+  # Enable coffee-script compiling
+  launch 'coffee', (['-c', '-b', '-l', '-o' ].concat paths.coffee), coffeeCallback
+  # From Module 'jade'
+  #  
+  exec "jade #{paths.jade[2]} -v --pretty --out #{paths.jade[1]}" 
+  # From Module 'jst'
+  #  
+  exec "jst -t dust #{paths.jst[0]} > #{paths.jst[1]}" 
+  
+
+# ## *build:release*
+# Copy contents of debug to web release folder and minify
+task 'build:release', 'Copy contents of debug to web release folder and minify', ()-> build_release -> log ':)', green
+build_release = ()->
+  exec "cp -r #{paths.release[0]} #{paths.release[1]}" if paths? and paths.release
+  minify()
+
+# ## *watch*
+# watch project src folders and build on change
+task 'watch', 'watch project src folders and build on change', ()-> watch -> log ':)', green
+watch = ()->
+  exec "supervisor -e '#{exts}' -n exit -q -w src -x 'cake' build" 
+
+# ## *minify*
+# Minify Generated JS and HTML
+task 'minify', 'Minify Generated JS and HTML', ()-> minify -> log ':)', green
+minify = ()->
+  
+
+# ## *docs*
+# Generate Documentation
+task 'docs', 'Generate Documentation', ()-> docs -> log ':)', green
+docs = ()->
+  # From Module 'docco'
+  #  
+  if moduleExists 'docco' && paths? && paths.coffee
+    walk paths.coffee[0], (err, paths) ->
+      try
+        launch 'docco', paths, doccoCallback()
+      catch e
+        error e
+  
+
+# ## *test*
+# Runs your test suite.
+task 'test', 'Runs your test suite.', (options=[],callback)-> test -> log ':)', green
+test = (options=[],callback)->
+  # From Module 'mocha'
+  #  
+  if moduleExists('mocha')
+    if typeof options is 'function'
+      callback = options
+      options = []
+    # add coffee directive
+    options.push '--compilers'
+    options.push 'coffee:coffee-script'
+    
+    launch 'mocha', options, callback
+  
+
+# ## *up2date*
+# installs/updates referenced NPMs and Gems
+task 'up2date', 'installs/updates referenced NPMs and Gems', ()-> up2date -> log ':)', green
+up2date = ()->
+  
+
+
+# Begin Helpers
+#  
+launch = (cmd, options=[], callback) ->
+  cmd = which(cmd) if which
+  app = spawn cmd, options
+  app.stdout.pipe(process.stdout)
+  app.stderr.pipe(process.stderr)
+  app.on 'exit', (status) -> callback?() if status is 0#  
+log = (message, color, explanation) -> 
+  console.log color+message+reset+(explanation or '')#  
+moduleExists = (name) ->
+  try 
+    require name 
+  catch err 
+    error name+ 'required: npm install '+name, red
+    false#  
+bin = (file) ->
+  if file.match /.coffee$/
+    fs.unlink file.replace(/.coffee$/, '.js')
+    true
+  else false#  
+walk = (dir, done) ->
+  # Directory Traversal
+  results = []
+  fs.readdir dir, (err, list) =>
+    return done(err, []) if err
+    pending = list.length
+    return done(null, results) unless pending
+    for name in list
+      fs.stat dir+'/'+name, (e,stat)=>
+        stat = null if e?
+        if stat?.isDirectory()
+          walk file, (err, res) =>
+            results.push name for name in res
+            done(null, results) unless --pending
+        else
+          results.push file
+          done(null, results) unless --pending
+
+
