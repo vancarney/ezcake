@@ -115,14 +115,14 @@ describe 'EzCake Test Suite', ->
     # it 'should set properties from arguments array', =>
       # @ezcake.processConfiguration()
       # @ezcake.cnf.should.be.a 'object'
-    # it 'should set Commader Options with getOpts', =>
-      # process.argv = commands.withOpts
-      # @ezcake.getOpts()
-      # @ezcake.cmd.options[@ezcake.cmd.options.length-1].short.should.equal '-1'
-    # it 'should obey directives', =>
-      # @ezcake.getDirectives()
-      # @ezcake.callbacks.onLoadedModuleCallback.should.be.a 'string'
-      # @ezcake.paths.testing[0].should.equal 'loaded'
+    it 'should set Commader Options with getOpts', =>
+      process.argv = commands.withOpts
+      @ezcake.getOpts()
+      @ezcake.cmd.options[@ezcake.cmd.options.length-1].short.should.equal '-1'
+    it 'should obey directives', =>
+      @ezcake.getDirectives()
+      @ezcake.callbacks.onLoadedModuleCallback.should.be.a 'string'
+      @ezcake.paths.testing[0].should.equal 'loaded'
     # it 'should have a getExts method', =>
       # (typeof @ezcake.getExts).should.equal 'function'
     # it 'should have getExts return a string', =>

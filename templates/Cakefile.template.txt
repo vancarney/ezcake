@@ -1,0 +1,12 @@
+## Another Cakefile made with love by ezcake v{version}
+{declarations}
+# paths object for module invocation reference
+paths=#{paths}
+# file extensions for watching
+exts={exts}
+# Begin Callback Handlers
+{callbacks}
+# Begin Tasks
+{tasks}
+# Begin Helpers
+{helpers}

@@ -1,0 +1,27 @@
+{
+  "name": "node-app",
+  "description": "Create, Test and Deploy NodeJS Applications",
+  "commands": [
+    "lib"
+  ],
+  "modules": [
+    "coffee",
+    "docco",
+    "mocha",
+    "markdown"
+  ],
+  "tasks": [
+    "build",
+    "watch",
+    "docs",
+    "test",
+    "up2date"
+  ],
+  "files": "README.md",
+  "paths": {
+    "coffee": [
+      "src/coffee",
+      "."
+    ]
+  }
+}

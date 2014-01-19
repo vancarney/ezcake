@@ -1,0 +1,32 @@
+{
+  "name": "node-npm",
+  "description": "Create, Test and Deploy NodeJS Modules",
+  "commands": [
+    "lib",
+    "bin"
+  ],
+  "modules": [
+    "coffee",
+    "docco",
+    "mocha",
+    "markdown"
+  ],
+  "tasks": [
+    "build",
+    "watch",
+    "docs",
+    "test",
+    "up2date"
+  ],
+  "files": "README.md",
+  "paths": {
+    "coffee": [
+      ".",
+      "src/coffee"
+    ],
+    "bin": [
+      "src/coffee/newbin",
+      "newbin"
+    ]
+  }
+}

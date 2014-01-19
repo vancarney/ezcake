@@ -21,7 +21,7 @@ fs = require 'fs'
 {print} = require 'util'
 {spawn, exec} = require 'child_process'
 _ = require 'underscore'
-
+fList = require './src/manifest.json'
 try
   which = require('which').sync
 catch err
@@ -164,6 +164,16 @@ launch = (cmd, options=[], callback) ->
   app.stderr.pipe(process.stderr)
   app.on 'exit', (status) -> callback?() if status is 0
 
+coffeeCallback=()->
+  try
+    if (files = fs.readdirSync ("#{paths.coffee[0]}")) != null and files.length
+      for file in (_.filter files, (o)->o.match /\.js+$/)
+        out = "#{paths.coffee[0]}/#{file}".split('.').shift()
+        exec "echo '#!/usr/bin/env node' | cat - #{paths.coffee[0]}/#{file.split('/').pop()} > #{out}", =>
+          fs.unlink "#{paths.coffee[0]}/#{file.split('/').pop()}"
+  catch e
+    console.error "error: #{e}"
+  
 # ## *build*
 #
 # **given** optional boolean as watch
@@ -176,16 +186,8 @@ build = (watch, callback) ->
     watch = false
   options = ['-c', '-b', '-l', '-o' ].concat paths.coffee
   options.unshift '-w' if watch
-  launch 'coffee', options, ()=>
-    exec 'jst -t dust src/templates > bin'
-    try
-      if (files = fs.readdirSync ("#{paths.coffee[0]}")) != null and files.length
-        for file in (_.filter files, (o)->o.match /\.js+$/)
-          out = "#{paths.coffee[0]}/#{file}".split('.').shift()
-          exec "echo '#!/usr/bin/env node' | cat - #{paths.coffee[0]}/#{file} > #{out}", =>
-            fs.unlink "#{paths.coffee[0]}/#{file}"
-    catch e
-      console.error "error: #{e}"
+  console.log "coffee --join #{paths.coffee[0]}/#{fList.files[0].split('/').pop().split('.').shift()}.js --compile #{fList.files.join(' ').replace(/('|\")/g, '')}"
+  exec "coffee --join #{paths.coffee[0]}/ezcake.js --compile #{fList.files.join(' ').replace(/('|\")/g, '')}", coffeeCallback
     
 
 
