@@ -1,6 +1,7 @@
 {
   "author": "Van Carney <carney.van@gmail.com>",
   "name": "ezcake",
+  "main":"ezcake",
   "description": "Commandline Cakefile Generator",
   "version": "0.0.1",
   "licenses": [
@@ -9,10 +10,6 @@
       "url": "http://www.opensource.org/licenses/MIT"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "github.com/vancarney/ezcake.git"
-  },
   "files":["./templates"],
   "dependencies": {
     "require_tree":"0.6.5",
@@ -35,7 +32,5 @@
   "scripts": {
     "test": "cake test"
   },
-  "bin": {
-    "ezcake": "./bin/ezcake"
-  }
+  "bin": "ezcake.js"
 }
