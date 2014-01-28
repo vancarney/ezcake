@@ -10,8 +10,11 @@
       "url": "http://www.opensource.org/licenses/MIT"
     }
   ],
-  "files":["./templates"],
+  "files":["bin","templates"],
   "dependencies": {
+    "async":"~0.2.8", 
+    "commander":"~1.1.1",
+    "underscore": "~1.4.2",
     "require_tree":"0.6.5",
     "coffee-script": "~1.4.0",
     "universal-jst": "~1.0.4",
@@ -20,17 +23,13 @@
     "which":"~1.0.5"
   },
   "devDependencies": {
-    "underscore": "~1.4.2",
-    "async":"~0.2.8", 
-    "commander":"~1.1.1",
     "mocha": "~1.8.1",
     "chai": "~1.4.2",
-    "docco": "~0.4.0",
-    "which":"~1.0.5"
+    "docco": "~0.4.0"
   },
   "homepage": "http://www.ezcakejs.com",
   "scripts": {
     "test": "cake test"
   },
-  "bin": "ezcake.js"
+  "bin":"bin/ezcake"
 }

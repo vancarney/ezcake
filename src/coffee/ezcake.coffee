@@ -1,5 +1,5 @@
 ## EzCake Cake File Generator
-#### (c)2012-2014 Van Carney 
+#### (c)2012-2014 Van Carney
 class ezcake
   version: '0.0.1'
   # requires [Node::FS](http://nodejs.org/api/fs.html)
@@ -28,7 +28,7 @@ class ezcake
   # User Selected Config
   uConfig:undefined
   #### Constructor Method
-  constructor:()->    
+  constructor:()->  
     @config = @require_tree null
     @async.series [
       ((cb)=>
