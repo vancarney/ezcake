@@ -15,6 +15,7 @@ paths =
     'src/coffee'
   ]
   bin:['bin']
+  
 
 
 fs = require 'fs'
@@ -105,6 +106,13 @@ task 'test', 'run tests', -> build -> mocha -> log ":)", green
 # cake clean
 # ```
 task 'clean', 'clean generated files', -> clean -> log ";)", green
+
+option '-s', '--string [COFFEE_STRING]', 'pass string as task param'
+option '-a', '--arr [ARRAY]', 'pass array as task param'
+task 'coffee:eval', 'outputs coffee-script string as compiled javascript', (options, callback)-> coffee_eval options, (e,sOut,sErr)-> console.log sOut || sErr
+coffee_eval = (options, callback)->
+  console.log options.arr.toString()
+  exec "echo '#{options.string}' | coffee -s -p", null, callback
 
 
 # Internal Functions

@@ -1,0 +1,121 @@
+[
+  {
+    "name":"getUserHome",
+    "description":"Retrieves the User Home Directory",
+    "body":"process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE"
+  },
+  {
+    "name":"getUserName",
+    "description":"Retrieves the Current User Name",
+    "requires":[
+      {
+        "name":"path"
+      }
+    ],
+    "dependencies": [
+      {
+        "name":"getUserHome",
+        "kind":"helper"
+      }
+    ],
+    "body":"@getUserHome().split(path.sep).pop()"
+  },
+  {
+    "name": "launch",
+    "description": " ",
+    "requires": [
+      {
+        "name":"child_process"
+      }
+    ],
+    "args":[
+      "cmd", 
+      "options=[]", 
+      "callback"
+    ],
+    "body": "cmd = which(cmd) if which\n  app = child_process.spawn cmd, options\n  app.stdout.pipe(process.stdout)\n  app.stderr.pipe(process.stderr)\n  app.on 'exit', (status) -> callback?() if status is 0"
+  },
+  {
+    "name": "log",
+    "requires": [
+      {
+        "name":"util"
+      }
+    ],
+    "dependencies": [
+    {
+      "name":"colors",
+      "kind":"declaration"
+    }
+    ],
+    "description": " ",
+    "args":[
+      "message",
+      "explanation",
+      "color=reset"
+    ],
+    "body": "util.log \"#{color}#{message}#{reset} #{explanation || ''}\""
+  },
+  {
+    "name": "error",
+    "requires": [
+      {
+        "name":"util"
+      }
+    ],
+    "dependencies": [
+    {
+      "name":"colors",
+      "kind":"declaration"
+    }
+    ],
+    "description": " ",
+    "args":[
+      "message",
+      "explanation"
+    ],
+    "body": "util.error \"#{red}#{message}#{reset} #{explanation || ''}\""
+  },
+  {
+    "name": "debug",
+    "requires": [
+      {
+        "name":"util"
+      }
+    ],
+    "description": " ",
+    "args":[
+      "message"
+    ],
+    "body": "util.debug \"#{message}\""
+  },
+  {
+    "name": "moduleExists",
+    "description": " ",
+    "args":["name"],
+    "body": "try \n    require name \n  catch err \n    error name+ 'required: npm install '+name, red\n    false"
+  },
+  {
+    "name": "bin",
+    "description": " ",
+    "requires": [
+      {
+        "name":"fs"
+      }
+    ],
+    "args":["file"],
+    "body": "if file.match /.coffee$/\n    fs.unlink file.replace(/.coffee$/, '.js')\n    true\n  else false"
+  },
+  {
+    "name": "walk",
+    "description": " ",
+    "requires": [
+      {
+        "name":"fs",
+        "kind":"declaration"
+      }
+    ],
+    "args":["dir", "done"],
+    "body": "results = []\n  fs.readdir dir, (err, list) =>\n    return done(err, []) if err\n    pending = list.length\n    return done(null, results) unless pending\n    for name in list\n      fs.stat dir+'/'+name, (e,stat)=>\n        stat = null if e?\n        if stat?.isDirectory()\n          walk file, (err, res) =>\n            results.push name for name in res\n            done(null, results) unless --pending\n        else\n          results.push file\n          done(null, results) unless --pending\n\n\n"
+  }
+]

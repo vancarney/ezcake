@@ -1,4 +1,5 @@
 #### onCreate
+# handles create command
 ezcake::onCreate = ->
   @usage="""create #{@CONFIG or '<type>'} <name> [options]
   
@@ -6,12 +7,13 @@ ezcake::onCreate = ->
   """
   @usage += "\n  Available types: #{@getConfigurations().join ', '}" if typeof @CONFIG == 'undefined'
   if (typeof @NAME != 'undefined') then @$path +="/#{@NAME}" else process.argv.push '-h'
-  @fs.exists @$path, (bool)=>
+  fs.exists @$path, (bool)=>
     if !bool
-      @fs.mkdir @$path, (e)=>
+      fs.mkdir @$path, (e)=>
         @error e if e?
         @success = "#{@CONFIG} created as #{@NAME}\n"
 #### onInit
+# handles init command
 ezcake::onInit = ->
   @usage="""init #{@CONFIG or '<type>'} [options]
   

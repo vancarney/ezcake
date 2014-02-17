@@ -1,0 +1,80 @@
+## This Cakefile was created by ezcake v<%= version %>
+<% _.each( reqs, function(itm,key) { %>
+# ## requires: <%= itm.name %>
+try
+	<%= itm.varname || itm.name %> = require '<%= itm.name %>'
+catch e
+	console.error 'The module \'<%= itm.name %>\' was not found. Try "npm install <%= itm.name %>"'
+<% }); %>
+<% _.each( declarations, function(itm,key) { %>
+# ## Declaration: <%= itm.name %>
+# <%= itm.description %>
+<%= itm.body %>
+<% }); %>
+async = require 'async'
+
+# Declares Paths object for module invocation reference
+paths = <%= paths %>
+
+# Declares File Extensions for watching
+exts = '<%= exts %>'
+
+# Begin Options
+<% _.each( options, function(itm,key) { %>
+option <%= _.map(itm, function(v){return "'"+v+"'"}).toString() %>
+<% }); %>
+
+# Begin Helpers
+<% _.each( helpers, function(itm,key) { %>
+# ## Helper: <%= itm.name %>
+# <%= itm.description %>
+<%= itm.name %> = (<%= itm.args ? itm.args.toString() : '' %>)->
+	<%= itm.body %>
+<% }); %>
+
+# Begin Callback Handlers
+<% _.each(callbacks, function(itm,key) { %>
+# ## *<%= itm.name %>*
+<%= itm.name %> = ->
+	async.series [
+		<% _.each(itm.invocations, function(v,k) { %>
+		# Following lines from `<%= v.callee %>`
+		((a_callback)=>
+		  <%= (v.body || "").replace( /\n/g, "\n\t\t" ) %>
+		)<%= (k < itm.invocations.length - 1) ? ',' : '' %>
+		<% }); %>
+	]
+<% }); %>
+
+# Begin Tasks
+<% _.each( tasks, function(itm,key) { %>
+# ## *<%= itm.name %>*
+# <%= itm.description %>
+task '<%= itm.name %>', '<%= itm.description %>', (options, callback)-> <%= itm.name.replace(/:/g, '_') %> options, <%= itm.init_callback || 'callback' %>
+<%= itm.name.replace(/:/g, '_') %> = (options, callback)->
+	async.series [
+		((step_callback)=>
+	 		<%= (itm.body || "").replace( /\n/g, "\n\t\t" )  || "# invocations" %>
+	 	),
+		<% _.each(itm.invocations, function(v,k) { %>
+		((step_callback)=>
+			# Following lines from `<%= v.callee %>`
+			<%= (v.body || "").replace( /\n/g, "\n\t\t" )  %>
+		),
+		<% }); %>
+		((step_callback)=>
+			callback?()
+			step_callback null
+		)
+	]
+<% }); %>
+
+# Begin Templates
+templates = <%= templates %>
+
+#							,d00b.d00b,
+#							00000000000 
+#							`Y0000000Y'
+#							  `Y0000Y'    
+#							    `v'
+#	.:*~ The Secret Ingredient Is Love ~*:.

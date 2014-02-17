@@ -2,17 +2,8 @@
 #### (c)2012-2014 Van Carney
 class ezcake
   version: '0.0.1'
-  # requires [Node::FS](http://nodejs.org/api/fs.html)
-  fs: require 'fs'
-  # requires [async](https://npmjs.org/package/async)
-  async: require 'async'
-  # requires [commander](https://npmjs.org/package/commander)
-  cmd: require 'commander'
-  # requires [require_tree](https://npmjs.org/package/require_tree)
-  require_tree: require( 'require_tree' ).require_tree
-  # requires [UnderscoreJS](https://npmjs.org/package/underscore)
-  _: require 'underscore'
-  templates_path:'./templates'
+  module_path:process.mainModule.filename.split('/bin').shift()
+  config_path:"data/json/default"
   strings:
     hash:   '#'
     red:    '\u001b[31m'
@@ -26,45 +17,76 @@ class ezcake
   CONFIG:undefined
   NAME:undefined
   # User Selected Config
-  uConfig:undefined
+  uConfig:{}
   #### Constructor Method
   constructor:()->  
-    @config = @require_tree null
-    @async.series [
-      ((cb)=>
-        @loadConfig @templates_path, cb
-      ),
+    @config = require_tree null
+    user_home_exists    = false
+    user_config_exists  = false
+    uPath = process.cwd()
+    async.series [
       ((cb)=>
         @createOpts cb
       ),
       ((cb)=>
         # our actual path for reference use
-        @fs.realpath '.', false, (e, path)=>
+        fs.realpath '.', false, (e, path)=>
           @error e if e?
           @$path = path
           cb null, "ok"
       ),
-      # load the global config file if `EZCAKE_HOME` is defined and we aren't ignoring
       ((cb)=>
-        if (@$home = process.env.EZCAKE_HOME) != undefined and !@cmd.ignore
-          @loadConfig "#{@$home}/ezcake.json", cb
-        else
-          cb()
+        if (@home = process.env.EZCAKE_HOME) != undefined
+          fs.exists "#{@home}", (bool)=>
+            user_home_exists = bool
+            fs.exists "#{@home}/ezcake.json", (bool)=>
+              user_config_exists = bool
+              cb null
       ),
       ((cb)=>
         @preProcessArgs cb
       ),
+      # load the global config file if `EZCAKE_HOME` is defined and we aren't ignoring
+      ((cb)=>
+        if user_config_exists and cmd.ignore
+          process.chdir _.initial(@home.split path.sep).join path.sep
+          @loadConfig  _.last(@home.split path.sep), =>
+            # @uConfig = @config
+            cb()
+        else
+          process.chdir _.initial("#{@module_path}/#{@config_path}".split path.sep).join path.sep
+          @loadConfig _.last(@config_path.split path.sep), =>
+            # @uConfig = @config
+            if user_home_exists
+              process.chdir _.initial(@home.split path.sep).join path.sep
+              @loadConfig _.last(@home.split path.sep), =>
+                process.chdir uPath
+                cb()
+            else
+              process.chdir uPath
+              cb()
+      ),
       ((cb)=>
         # if the user has passed a location in the commandline, we will load that location now
-        if @cmd.location
-          @_.each @cmd.location, (l,idx)=>
-            @loadConfig l, =>
-              cb null, "ok" if idx == @cmd.location.length
+        if cmd.location
+          _.each cmd.location, (location,idx)=>
+            process.chdir _.initial(location.split path.sep).join path.sep
+            @loadConfig _.last(location.split path.sep ), =>
+              process.chdir uPath
+              if idx == cmd.location.length - 1
+                cb null, "ok" 
         else
           cb null, "ok" 
       ),
+      ((cb)=>
+        @mergeConfigs()
+        cb null
+      ),
       # Now that all `configs` are loaded, we can do process the complete options set
       ((cb)=>
+        @extendConfigurations()
+        # console.log @config
+        #console.log JSON.stringify @config, null, 2
         @processArgs cb
       ),
       ((cb)=>
@@ -75,9 +97,9 @@ class ezcake
             when "init", "i" then @onInit()
             else
               if typeof @COMMAND == 'undefined'
-                process.argv.push '-h'
-                @help()
-                @cmd.usage( """
+                # process.argv.push '-h'
+                # @help()
+                cmd.usage( """
                 <command> [options]
                 
                   where <command> is one of:
@@ -88,7 +110,7 @@ class ezcake
                 process.exit 0
               else 
                 @error "Command must be either 'create' or 'init' try \'ezcake create #{@COMMAND}'"
-        @cmd.usage @usage
+        cmd.usage @usage
         cb null, "ok"
       ),
       ((cb)=>
@@ -99,7 +121,7 @@ class ezcake
         else
           process.argv.push '-h'
           @help()
-          @cmd.parse process.argv
+          cmd.parse process.argv
           process.exit 0
       ),
       ((cb)=>
@@ -107,17 +129,18 @@ class ezcake
       ),
       # check for help flag
       ((cb)=>
-        process.argv.push '-h' if @help()
+        if @help()
+          process.argv.push '-h'
         cb null
       ),
       ((cb)=>
         # finally parse input from arrgv
-        @cmd.parse process.argv
+        cmd.parse process.argv
         cb null
       ),
       ((cb)=>
+        @npmPackage = new NPMPackage @$path
         # finally parse input from arrgv
-        # console.log JSON.stringify @uConfig, null, 2
         @generateConfiguration cb
       )
     ], (err,r)=>

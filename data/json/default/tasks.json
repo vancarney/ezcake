@@ -1,0 +1,62 @@
+[
+  {
+    "name": "build",
+    "description": "Compiles Sources"
+  },
+  {
+    "name": "build:release",
+    "description": "Copy contents of debug to web release folder and minify",
+    "paths": [
+      "debug",
+      "www"
+    ],
+    "body": "exec \"cp -r #{paths.release[0]} #{paths.release[1]}\" if paths?.release"
+  },
+  {
+    "name": "watch",
+    "description": "watch project src folders and build on change"
+  },
+  {
+    "name":"coffee:eval",
+     "description":"outputs coffee-script string as compiled javascript",
+     "init_callback":"(e,sOut,sErr)-> console.log sOut || sErr",
+     "body":"exec \"echo '#{options.string}' | coffee -s -p\", null, callback"
+  },
+  {
+    "name": "docs",
+    "description": "Generate Documentation",
+    "paths": [
+      "docs"
+    ]
+  },
+  {
+    "name": "minify",
+    "description": "Minify Generated JS and HTML"
+  },
+  {
+    "name": "readme",
+    "description": "Generate ReadMe HTML from Markdown"
+  },
+  {
+    "name": "test",
+    "description": "Runs your test suite.",
+    "args": [
+      "options=[]",
+      "callback"
+    ],
+    "paths": [
+      "tests"
+    ]
+  },
+  {
+    "name": "clean",
+    "description": "Cleans up generated js paths",
+    "args":["callback"],
+    "body": "try\n    for file in paths.coffee\n      unless unlinkIfCoffeeFile file\n      walk file, (err, results) ->\n        for f in results\n          unlinkIfCoffeeFile f\n      callback?()\n  catch err\n    console.error \"#{red}#{err}\""
+  },
+  {
+    "name": "up2date",
+    "description": "installs/updates referenced NPMs and Gems",
+    "body": ""
+  }
+]

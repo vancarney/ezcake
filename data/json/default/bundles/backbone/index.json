@@ -1,0 +1,4 @@
+{
+  "name":"backbone",
+  "command":["-B, --no-backbone", "exclude the Backbone package"]
+}

@@ -1,0 +1,7 @@
+(global, $) ->
+	<% if (strict) { print('use strict'); } %>
+	<% if (typeof(namespace) != undefined && namespace != null) { %>
+	<%= namespace %> = global.<%= namespace %> ?= {}
+	<% } else { namespace = 'global'; } %>
+	class <%= namespace %>.<%= name %> extends Backbone.Model
+) @, <%= DOM_LIB %>

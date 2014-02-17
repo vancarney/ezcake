@@ -2,8 +2,8 @@
 # validate `process.argv` @commandModuleArray and set variables based on it's content
 ezcake::preProcessArgs = (callback)->
   args = []
-  @_.each process.argv, (v,k)=>args.push v if (v.match /^(\-h|\-\-help)+$/) == null
-  @cmd.parse args
+  _.each process.argv, (v,k) => args.push v if (v.match /^(\-h|\-\-help)+$/) == null
+  cmd.parse args
   callback null
 #### void processArgs()
 # validate `process.argv` @commandModuleArray and set variables based on it's content
@@ -27,10 +27,12 @@ ezcake::processArgs = (cB)->
    cB()
 #### processConfiguration
 ezcake::processConfiguration = (cB)->
+  # console.log @uConfig
+  return @error 'No Configurations loaded' if !@uConfig.configurations
   # process our configuration
-  if typeof (@uConfig=@selectedConfig()) != 'undefined'
+  if typeof _.findWhere(@uConfig.configurations, name:@CONFIG) != 'undefined'
     # add no-config to Commander options
-    @cmd.option "-F, --no-config", "Do not create ezcake config file"
+    cmd.option "-F, --no-config", "Do not create ezcake config file"
     cB()
   else
     @error "Configuration '#{@CONFIG}' was not found"

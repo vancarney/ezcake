@@ -1,0 +1,68 @@
+{
+  "name": "web",
+  "description": "Standalone HTML UIs and PhoneGap Applications",
+  "commands": [
+    "assets",
+    "noJST"
+  ],
+  "bundles":["bower","backbone"],
+  "modules": [
+    "coffee",
+    "jade",
+    "less",
+    "scss",
+    "compass",
+    "jst",
+    "docco",
+    "mocha",
+    "uglifyjs",
+    "markdown"
+  ],
+  "tasks": [
+    "build",
+    "build:release",
+    "watch",
+    "minify",
+    "docs",
+    "test",
+    "up2date"
+  ],
+  "files": "README.md",
+  "paths": {
+    "release": [
+      "debug",
+      "www"
+    ],
+    "assets": [
+      "src/assets",
+      "debug"
+    ],
+    "coffee": [
+      "debug/js",
+      "src/coffee"
+    ],
+    "uglify": [
+      "www"
+    ],
+    "less": [
+      "src/less",
+      "debug/css"
+    ],
+    "jade": [
+      "src/jade",
+      "debug",
+      "src/jade/templates",
+      "src/jade/include"
+    ],
+    "jst": [
+      "src/jst",
+      "debug/js"
+    ]
+  },
+  "invocations": [
+    {
+      "call": "onBuild:release",
+      "body": "minify()"
+    }
+  ]
+}

@@ -5,6 +5,7 @@
     "src/coffee/args.coffee",
     "src/coffee/opts.coffee",
     "src/coffee/loadConfig.coffee",
+    "src/coffee/npm_package.coffee",
     "src/coffee/processor.coffee",
     "src/coffee/logging.coffee",
     "src/coffee/invoke.coffee"

@@ -1,0 +1,50 @@
+{
+  "name": "plugin",
+  "description": "Create JQuery, YUI and ExtJS plugins",
+  "commands": [
+    "assets",
+    "lib"
+  ],
+  "modules": [
+    "coffee",
+    "jade",
+    "less",
+    "scss",
+    "compass",
+    "docco",
+    "mocha",
+    "uglifyjs",
+    "markdown"
+  ],
+  "tasks": [
+    "build",
+    "watch",
+    "minify",
+    "docs",
+    "test",
+    "up2date"
+  ],
+  "files": "README.md",
+  "paths": {
+    "demo": [
+      "demo"
+    ],
+    "uglify": [
+      "lib"
+    ],
+    "assets": [
+      "src/assets",
+      "lib"
+    ],
+    "coffee": [
+      "lib",
+      "src/coffee"
+    ],
+    "jade": [
+      "src/jade",
+      "demo",
+      "src/jade/templates",
+      "src/jade/include"
+    ]
+  }
+}

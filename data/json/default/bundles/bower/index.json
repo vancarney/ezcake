@@ -1,0 +1,8 @@
+{
+  "name":"bower",
+  "command": ["-W, --no-bower", "disable Bower support"],
+  "declarations":[{
+    "description": "require Bower",
+    "body": "bower = require 'bower'"
+  }]
+}

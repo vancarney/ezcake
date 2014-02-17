@@ -9,11 +9,10 @@
 .sass-cache
 README.html
 
-# back up files
-###############
-backup
-foobar
+# sandbox/testing folders # 
+###########################
 sandbox
+ezcake_home
 
 # Node Modules #
 ################

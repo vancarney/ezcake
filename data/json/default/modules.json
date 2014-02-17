@@ -1,0 +1,288 @@
+[
+  {
+    "name": "coffee",
+    "description": "Enable coffee-script compiling",
+    "ext": "coffee",
+    "installer": "npm",
+    "installer_options": {"alias":"coffee-script", "version":"1.7.1"},
+    "paths": [
+      ".",
+      "src/coffee"
+    ],
+    "callback": "coffeeCallback",
+    "command": [
+      "-0, --no-coffee",
+      "don't use coffee-script (js only)"
+    ],
+    "invocations": [
+      {
+        "call": "onBuild",
+        "body": "launch 'coffee', (['-c', '-b', '-l', '-o' ].concat paths.coffee), @onCoffeeCallback()"
+      }
+    ]
+  },
+  {
+    "name": "scss",
+    "description": "use SCSS/SASS instead of less (requires ruby gems)",
+    "ext": "scss",
+    "installer": "gem",
+    "installer_options": {"alias":"sass"},
+    "callback": "scssCallback",
+    "paths": [
+      "src/scss",
+      "www/css"
+    ],
+    "command": [
+      "-s, --scss",
+      "use scss (sass) instead of less (requires ruby gems)"
+    ],
+    "setFlag": "-L",
+    "invocations": [
+      {
+        "call": "onBuild",
+        "body": "launch 'sass', paths.sass, scssCallback"
+      }
+    ]
+  },
+  {
+    "name": "less",
+    "description": " ",
+    "ext": "less",
+    "installer": "npm",
+    "callback": "lessCallback",
+    "paths": [
+      "src/less",
+      "www/css"
+    ],
+    "command": [
+      "-L, --no-less",
+      "do not use less"
+    ],
+    "invocations": [
+      {
+        "call": "onBuild",
+        "body": "launch 'lessc', paths.less, lessCallback"
+      }
+    ]
+  },
+  {
+    "name": "jade",
+    "description": " ",
+    "ext": "jade",
+    "installer": "npm",
+    "paths": [
+      "src/jade",
+      "www",
+      "src/jade/templates",
+      "src/jade/includes"
+    ],
+    "command": [
+      "-J, --no-jade",
+      "do not use Jade templates"
+    ],
+    "invocations": [
+      {
+        "call": "onBuild",
+        "body": "exec \"jade #{paths.jade[2]} -v --pretty --out #{paths.jade[1]}\" "
+      }
+    ]
+  },
+  {
+    "name": "jst",
+    "description": " ",
+    "ext": "js",
+    "installer": "npm",
+    "installer_options": {"alias":"universal-jst"},
+    "paths": [
+      "src/jst",
+      "www/js"
+    ],
+    "allowed": [
+      "dust",
+      "mustache",
+      "handlebars",
+      "hogan"
+    ],
+    "command": [
+      "-t, --jst [engine]",
+      "use javascript template engine [dust,mustache,handlebars,hogan]",
+      null,
+      "dust"
+    ],
+    "invocations": [
+      {
+        "call": "onBuild",
+        "body": "exec \"jst -t dust #{paths.jst[0]} > #{paths.jst[1]}\" "
+      }
+    ]
+  },
+  {
+    "name": "jquery",
+    "description": " ",
+    "installer": "npm",
+    "command": [
+      "-q, --jquery",
+      "use jQuery for node"
+    ]
+  },
+  {
+    "name": "mocha",
+    "description": " ",
+    "installer": "npm",
+    "installer_options": {"development":true},
+    "paths": [
+      "test"
+    ],
+    "command": [
+      "-M, --no-mocha",
+      "disable mocha support"
+    ],
+    "invocations": [
+      {
+        "call": "onTest",
+        "body": "if moduleExists('mocha')\n    if typeof options is 'function'\n      callback = options\n      options = []\n    # add coffee directive\n    options.push '--compilers'\n    options.push 'coffee:coffee-script'\n    \n    launch 'mocha', options, callback"
+      }
+    ]
+  },
+  {
+    "name": "chai",
+    "description": " ",
+    "dependencies": [
+    {
+      "name":"mocha",
+      "kind":"module"
+    }
+    ],
+    "installer": "npm",
+    "installer_options": {"development": true},
+    "paths": [
+      "test"
+    ],
+    "command": [
+      "-C, --no-chai",
+      "disable chai support"
+    ]
+  },
+  {
+    "name": "supervisor",
+    "description": "Use Supervisor for file watching ",
+    "installer": "npm",
+    "installer_options": {"development": true},
+    "command": [
+      "-S, --no-supervisor",
+      "disable supervisor support"
+    ],
+    "paths": [
+      "src"
+    ],
+    "invocations": [
+      {
+        "call": "onWatch",
+        "body": "exec \"supervisor -e '#{exts}' -n exit -q -w '#{paths.supervisor[0]}' -x 'cake' build\" "
+      }
+    ]
+  },
+  {
+    "name": "docco",
+    "description": " ",
+    "installer": "npm",
+    "installer_options": {"development": true},
+    "dependencies": [
+    {
+      "name":"child_process",
+      "kind":"declaration"
+    },
+    {
+      "name":"walk",
+      "kind":"helper"
+    },
+    {
+      "name":"coffee",
+      "kind":"module"
+    }
+    ],
+    "command": [
+      "-D, --no-docco",
+      "disable docco support"
+    ],
+    "callback": "doccoCallback",
+    "invocations": [
+      {
+        "call": "onDocs",
+        "body": "if moduleExists 'docco' && paths? && paths.coffee\n    walk paths.coffee[0], (err, paths) ->\n      try\n        launch 'docco', paths, doccoCallback()\n      catch e\n        error e"
+      }
+    ]
+  },
+  {
+    "name": "markdown",
+    "description": " ",
+    "installer": "gem",
+    "installer_options": {"development": true},
+    "dependencies": [
+    {
+      "name":"child_process",
+      "kind":"declaration"
+    }
+    ],
+    "command": [
+      "-k, --markdown",
+      "enable markdown parsing (requires ruby gems, Python and PEAK)"
+    ],
+    "invocations": [
+      {
+        "call": "onReadme",
+        "body": "launch 'markdown'"
+      }
+    ]
+  },
+  {
+    "name": "compass",
+    "description": " ",
+    "installer": "gem",
+    "ext": "scss",
+    "dependencies": [
+    {
+      "name":"child_process",
+      "kind":"declaration"
+    }
+    ],
+    "callback": "compassCallback",
+    "command": [
+      "-c, --compass",
+      "use Compass for SCSS (requires ruby gems)"
+    ],
+    "invocations": [
+      {
+        "call": "onBuild",
+        "body": "launch 'compass', ['compile', '--sass-dir=#{paths.scss[1]}', '--css-dir=#{paths.scss[0]}'], callback"
+      }
+    ]
+  },
+  {
+    "name": "uglifyjs",
+    "description": " ",
+    "installer": "npm",
+    "installer_options": {"development": true},
+    "dependencies": [
+    {
+      "name":"child_process",
+      "kind":"declaration"
+    },
+    {
+      "name":"walk",
+      "kind":"helper"
+    }
+    ],
+    "command": [
+      "-U, --no-uglify",
+      "do not use uglifyjs"
+    ],
+    "callback": "minifyCallback",
+    "invocations": [
+      {
+        "call": "onMinify",
+        "body": "# minify js and html paths\n  if paths? and paths.uglify?\n    walk \"#{paths.uglify[0]}\", (err, results) =>\n      for file in results\n        continue if file.match /.min.js+$/\n        launch 'uglifyjs', if file.match /.js+$/ then ['--output', \"dir/#{file.replace /.js+$/,'.min.js'}\", file] else ['--output', \"dir/#{file}\", file]"
+      }
+    ]
+  }
+]

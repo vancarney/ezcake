@@ -1,37 +1,43 @@
 {
 	"tasks":[{
 		"name":"loadedTask",
-		"options":{
-			"description":"A Task Loaded from a Clonfig file",
-			"handler":"console.log 'testing'"
-		}
+	  "description":"A Task Loaded from a Clonfig file",
+	  "body":"console.log 'testing'"
 	}],
 	"modules":[{
 		"name":"loadedModule",
-		"options":{
-			"callback":"loadedModuleCallback",
-			"onBuild":"exec 'echo, [\"testing\"], loadedModuleCallback()",
-			"command":["-M, --no-loadedModule", "don't use loadedModule"]
-		}
-	}],
+		"callback":"loadedModuleCallback",
+		"onBuild":"exec 'echo, [\"testing\"], loadedModuleCallback()",
+		"command":["-M, --no-loadedModule", "don't use loadedModule"]
+	},
+	{
+    "name": "scss",
+    "description": "OVERRIDEN MODULE",
+    "ext": "scss",
+    "installer": "gem",
+    "installer_alias": "sass",
+    "callback": "scssCallback",
+    "command": [
+      "-s, --scss",
+      "use scss (sass) instead of less (requires ruby gems)"
+    ]
+  }],
 	"commands":[{
 		"name":"testing",
-		"options":{
-			"paths":["loaded"],
-			"onLoadedModuleCallback":"console.log 'loaded Command Callback from Loaded Module'",
-			"command":["-1, --no-testing", "a loaded command"]
-		}
+	  "paths":["loaded"],
+		"onLoadedModuleCallback":"console.log 'loaded Command Callback from Loaded Module'",
+		"command":["-1, --no-testing", "a loaded command"]
 	}],
 	"configurations":[{
 		"name":"loadedConfiguration",
-		"options":{
-			"commands":["assets", "noJST","testing"],
-			"modules":["coffee","jade","less","scss","compass","jst","docco","mocha","uglify","markdown","loadedModule"],
-			"tasks":["build","build_xcode","watch","minify","docs","test","loadedTask"]
-		}
+		"commands":["assets", "noJST","testing"],
+		"modules":["coffee","jade","less","scss","compass","jst","docco","mocha","uglify","markdown","loadedModule"],
+		"tasks":["build","build_xcode","watch","minify","docs","test","loadedTask"]
 	},
 	{
 		"name":"lt",
-		"inherits":"loadedConfiguration"
+		"inherits":"loadedConfiguration",
+    "modules":["coffee","jade","less","scss","compass","jst","docco","mocha","uglify","markdown"],
+    "tasks":["build","build_xcode","watch","minify","docs","test"]
 	}]
 }

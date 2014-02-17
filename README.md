@@ -248,14 +248,3 @@ A module may be anything that gets invoked from within an exec or launch stateme
 
 
 ### Headers
-
-
-
-
-<pre>
-,d00b.d00b,
-00000000000     .:*~ The Secret Ingrediant Is Love ~*:.
-`Y0000000Y'
-  `Y0000Y'    
-    `V'
-</pre>
