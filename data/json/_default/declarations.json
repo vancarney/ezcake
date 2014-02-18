@@ -1,0 +1,7 @@
+[
+  {
+    "name": "colors",
+    "description": "Terminal Colors",
+    "body": "# ANSI Terminal Colors\nbold = '\u001b[0;1m'\ngreen = '\u001b[0;32m'\nred = '\u001b[0;31m'\nreset = '\u001b[0m'"
+  }
+]

@@ -34,7 +34,7 @@ describe 'EzCake Test Suite', ->
   it 'should instantiate', =>
     (@ezcake = new EzCake).should.be.a 'object'
   describe 'EzCake Class Properties', =>
-    it 'should have @strings', =>
+    it 'should have ezcake.strings', =>
       @ezcake.strings.hash.should.equal '#'
       @ezcake.strings.red.should.equal '\u001b[31m'
       @ezcake.strings.green.should.equal '\u001b[32m'

@@ -1,0 +1,16 @@
+{
+  "name": "test",
+  "description": "Create, Test and Deploy NodeJS Modules",
+  "commands": [
+    "lib"
+  ],
+  "modules": [
+    "coffee"
+  ],
+  "tasks": [
+    "build",
+    "build:release",
+    "watch",
+    "coffee:eval"
+  ]
+}

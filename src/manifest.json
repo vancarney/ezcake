@@ -4,9 +4,10 @@
     "src/coffee/commands.coffee",
     "src/coffee/args.coffee",
     "src/coffee/opts.coffee",
-    "src/coffee/loadConfig.coffee",
+    "src/coffee/config_loader.coffee",
     "src/coffee/npm_package.coffee",
     "src/coffee/processor.coffee",
+    "src/coffee/cakefile_renderer.coffee",
     "src/coffee/logging.coffee",
     "src/coffee/invoke.coffee"
   ]

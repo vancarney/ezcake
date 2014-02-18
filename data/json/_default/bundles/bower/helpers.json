@@ -1,0 +1,5 @@
+{
+  "name":"bowerHelper",
+  "args":["invocation","success","fail"],
+  "body":"(invocation).on('end', (d)=>success?(d)).on('error', (e)=>fail? e).on('prompt', (a,cB)=>console.log 'prompt')"
+}

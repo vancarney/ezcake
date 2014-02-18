@@ -4,23 +4,9 @@ class ezcake
   version: '0.0.1'
   module_path:process.mainModule.filename.split('/bin').shift()
   config_path:"data/json/default"
-  strings:
-    hash:   '#'
-    red:    '\u001b[31m'
-    green:  '\u001b[32m'
-    yellow: '\u001b[33m'
-    reset:  '\u001b[0m'
-  # Commandline Params
-  ENV:undefined
-  PATH:undefined
-  COMMAND:undefined
-  CONFIG:undefined
-  NAME:undefined
-  # User Selected Config
-  uConfig:{}
   #### Constructor Method
-  constructor:()->  
-    @config = require_tree null
+  constructor:()->
+    @configs = new ConfigLoader
     user_home_exists    = false
     user_config_exists  = false
     uPath = process.cwd()
@@ -31,7 +17,7 @@ class ezcake
       ((cb)=>
         # our actual path for reference use
         fs.realpath '.', false, (e, path)=>
-          @error e if e?
+          ezcake.error e if e?
           @$path = path
           cb null, "ok"
       ),
@@ -50,16 +36,13 @@ class ezcake
       ((cb)=>
         if user_config_exists and cmd.ignore
           process.chdir _.initial(@home.split path.sep).join path.sep
-          @loadConfig  _.last(@home.split path.sep), =>
-            # @uConfig = @config
-            cb()
+          @configs.loadConfig _.last(@home.split path.sep), => cb()
         else
           process.chdir _.initial("#{@module_path}/#{@config_path}".split path.sep).join path.sep
-          @loadConfig _.last(@config_path.split path.sep), =>
-            # @uConfig = @config
+          @configs.loadConfig _.last(@config_path.split path.sep), =>
             if user_home_exists
               process.chdir _.initial(@home.split path.sep).join path.sep
-              @loadConfig _.last(@home.split path.sep), =>
+              @configs.loadConfig _.last(@home.split path.sep), =>
                 process.chdir uPath
                 cb()
             else
@@ -71,7 +54,7 @@ class ezcake
         if cmd.location
           _.each cmd.location, (location,idx)=>
             process.chdir _.initial(location.split path.sep).join path.sep
-            @loadConfig _.last(location.split path.sep ), =>
+            @configs.loadConfig _.last(location.split path.sep ), =>
               process.chdir uPath
               if idx == cmd.location.length - 1
                 cb null, "ok" 
@@ -79,24 +62,22 @@ class ezcake
           cb null, "ok" 
       ),
       ((cb)=>
-        @mergeConfigs()
+        @configs.mergeConfigs()
         cb null
       ),
       # Now that all `configs` are loaded, we can do process the complete options set
       ((cb)=>
-        @extendConfigurations()
-        # console.log @config
-        #console.log JSON.stringify @config, null, 2
+        @configs.extendConfigurations()
         @processArgs cb
       ),
       ((cb)=>
         # we do this check to avoid testing conflicts
         if process.argv[1].split('/').pop() == 'ezcake'
-          switch @COMMAND
+          switch ezcake.COMMAND
             when "create", "c" then @onCreate()
             when "init", "i" then @onInit()
             else
-              if typeof @COMMAND == 'undefined'
+              if typeof ezcake.COMMAND == 'undefined'
                 # process.argv.push '-h'
                 # @help()
                 cmd.usage( """
@@ -109,14 +90,14 @@ class ezcake
                 """).parse process.argv
                 process.exit 0
               else 
-                @error "Command must be either 'create' or 'init' try \'ezcake create #{@COMMAND}'"
+                ezcake.error "Command must be either 'create' or 'init' try \'ezcake create #{ezcake.COMMAND}'"
         cmd.usage @usage
         cb null, "ok"
       ),
       ((cb)=>
-        # unset @configuration if it is help flag
-        @CONFIG = null if @CONFIG == "-h"
-        if @CONFIG
+        # unset ezcake.CONFIGuration if it is help flag
+        ezcake.CONFIG = null if ezcake.CONFIG == "-h"
+        if ezcake.CONFIG
           @processConfiguration cb
         else
           process.argv.push '-h'
@@ -139,12 +120,20 @@ class ezcake
         cb null
       ),
       ((cb)=>
+        @processor = new Processor @configs.selectedConfig()
         @npmPackage = new NPMPackage @$path
+        @npmPackage.addDependencies _.where (deps = @processor.getDependencies()), {type:'npm', development:false}
+        @npmPackage.addDependencies _.where(deps, {type:'npm', development:true}), true
         # finally parse input from arrgv
-        @generateConfiguration cb
+        (new CakefileRenderer @$path, "#{path.join @module_path, @configs.__config.cake_template}").render @processor.generateConfiguration(), cb
       )
     ], (err,r)=>
         # If we have gotten here without error, let's write our success message
-        @log "#{@strings.green}ezCake completed#{@strings.reset}\n"
+        ezcake.log "#{ezcake.strings.green}ezCake completed#{ezcake.strings.reset}\n"
         # ... and close up shop
         process.exit 0
+ezcake.ENV  = undefined
+ezcake.PATH = undefined
+ezcake.NAME = undefined
+ezcake.CONFIG  = undefined
+ezcake.COMMAND = undefined

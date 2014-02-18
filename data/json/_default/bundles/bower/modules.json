@@ -1,0 +1,6 @@
+{
+  "name": "bower",
+  "description": "Use Bower for Web Dependencies",
+  "installer": "npm",
+  "installer_options": "-g"
+}

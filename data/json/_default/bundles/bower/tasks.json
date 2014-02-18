@@ -1,0 +1,22 @@
+[{
+  "name":"bower:install",
+  "dependencies":["bower","inquirer"],
+  "description": "Adds a new Bower Package",
+  "args":["name", "params", "succeess", "fail"],
+  "body":"@bowerHelper bower.commands.install([name],{save:true},JSON.stringify params), success, fail" 
+},
+{
+  "name":"bower:uninstall",
+  "dependencies":["bower"],
+  "description": "Removes a new Bower Package"
+},
+{
+  "name":"bower:init",
+  "dependencies":["bower"],
+  "description": "Initializes current project as a new Bower Package"
+},
+{
+  "name":"bower:register",
+  "dependencies":["bower"],
+  "description": "Registers current project as Bower Package"
+}]

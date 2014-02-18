@@ -1,2 +1,0 @@
-ezcake::formatter = (list)->
-  

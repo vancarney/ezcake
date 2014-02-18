@@ -1,0 +1,9 @@
+[{
+  "name":"backbone:generate",
+  "description": "Generate a new Backbone Class File",
+  "args": [
+    "kind",
+    "name",
+    "callback"],
+  "body": "fs.writeFile \"#{@$paths.backbone}/#{name}#{@templates.backbone[kind].split('.').pop()}\", data if (data = @template 'backbone', kind, params)?\ncallback?()"
+}]
