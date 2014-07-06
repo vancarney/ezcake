@@ -4,8 +4,13 @@
   "commands": [
     "lib"
   ],
-  "modules": [
+  "bundles":[
+    "ezcake",
+    "backbone",
     "coffee"
+  ],
+  "modules": [
+    "fs-extra"
   ],
   "tasks": [
     "build",

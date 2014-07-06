@@ -8,73 +8,16 @@
     ],
     "dependencies": [
     {
-      "name":"child_process",
-      "kind":"declaration"
+      "name":"fs-extra",
+      "kind":"module"
     }
     ],
+    "paths": ["src/assets", "build"],
     "invocations": [
       {
         "call": "onBuild",
-        "body": "exec \"cp -r #{paths.assets[0]} #{paths.assets[1]}\" if paths? and paths.assets?"
+        "body": "(fs.copy paths.assets[0], paths.assets[1], null, (e)=> callback? e) if paths?.assets?.length >= 2"
       }
-    ]
-  },
-  {
-    "name": "bin",
-    "description": " ",
-    "paths": [
-      "bin",
-      "src/coffee/bin"
-    ],
-    "dependencies": [
-    {
-      "name":"fs",
-      "kind":"declaration"
-    },
-    {
-      "name":"child_process",
-      "kind":"declaration"
-    }
-    ],
-    "command": [
-      "-b, --bin",
-      "create 'bin' output and source directories (useful for nodejs commandline apps)"
-    ],
-    "invocations": [
-      {
-        "call": "onCoffeeCallback",
-        "body": "# try to move bin folder and cat shabang onto all files in ./bin, deleting original .js files when dones\n  try\n    exec \"mv #{paths.coffee[0]}/#{paths.bin[0]}/* #{paths.bin[0]}\" if paths.coffee?\n    fs.readdir (\"#{paths.coffee[0]}/#{paths.bin[0]}\")), (e,files)=>\n      console.error e if e?\n      for file in files\n        if file.match /.js+$/\n          out = \"#{paths.bin[0]}/#{file}\".split('.').shift()\n          exec \"echo '#!/usr/bin/env node' | cat - #{paths.bin[0]}/#{file} > #{out}\", =>\n            fs.unlink \"#{paths.bin[0]}/#{file}\""
-      }
-    ]
-  },
-  {
-    "name": "lib",
-    "description": " ",
-    "paths": {
-      "coffee": [
-        "lib",
-        "src/coffee"
-      ]
-    },
-    "command": [
-      "-L, --no-lib",
-      "do not create 'lib' output and source directories"
-    ]
-  },
-  {
-    "name": "force",
-    "description": " ",
-    "command": [
-      "-f, --force",
-      "force overwrite of default configurations"
-    ]
-  },
-  {
-    "name": "noJST",
-    "description": " ",
-    "command": [
-      "-T, --no-jst",
-      "disable javascript template parsing"
     ]
   }
 ]

@@ -1,0 +1,7 @@
+{
+  "name":"ezcake",
+  "command": [
+    "-1, --no-ezcake",
+    "do not include the ezcake provided bundle"
+  ]
+}

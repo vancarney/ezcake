@@ -1,0 +1,9 @@
+{
+  "name":"build_coffee",
+  "invocations": [
+    {
+      "call": "onBuild",
+      "body": "launch 'coffee', (['-c', '-b', '-l', '-o' ].concat paths.coffee), callback"
+    }
+  ]
+}

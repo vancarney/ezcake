@@ -5,5 +5,5 @@
     "kind",
     "name",
     "callback"],
-  "body": "fs.writeFile \"#{@$paths.backbone}/#{name}#{@templates.backbone[kind].split('.').pop()}\", data if (data = @template 'backbone', kind, params)?\ncallback?()"
+  "body": "fs.writeFile \"#{@$paths.backbone}/#{name}#{@templates.backbone[kind].split('.').pop()}\", data if (data = @template 'backbone', kind, params)?\n  callback?()"
 }]

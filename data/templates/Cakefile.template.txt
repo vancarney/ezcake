@@ -14,7 +14,7 @@ catch e
 async = require 'async'
 
 # Declares Paths object for module invocation reference
-paths = <%= paths %>
+paths = <%= JSON.stringify( paths, null, 2 ) %>
 
 # Declares File Extensions for watching
 exts = '<%= exts %>'
@@ -29,21 +29,23 @@ option <%= _.map(itm, function(v){return "'"+v+"'"}).toString() %>
 # ## Helper: <%= itm.name %>
 # <%= itm.description %>
 <%= itm.name %> = (<%= itm.args ? itm.args.toString() : '' %>)->
-	<%= itm.body %>
+  <%= itm.body %>
 <% }); %>
 
 # Begin Callback Handlers
 <% _.each(callbacks, function(itm,key) { %>
 # ## *<%= itm.name %>*
-<%= itm.name %> = ->
-	async.series [
+<%= itm.name %> = (success)->
+<% if (itm.invocations.length) { %>
+	async.series (
 		<% _.each(itm.invocations, function(v,k) { %>
-		# Following lines from `<%= v.callee %>`
-		((a_callback)=>
+		'<%= v.callee %>': ((callback)=>
+		  # Following lines from `<%= v.callee %>`
 		  <%= (v.body || "").replace( /\n/g, "\n\t\t" ) %>
 		)<%= (k < itm.invocations.length - 1) ? ',' : '' %>
 		<% }); %>
-	]
+	), (e,data)=> success? e, data
+<% } else { %> success?() <% } %>
 <% }); %>
 
 # Begin Tasks
@@ -51,22 +53,21 @@ option <%= _.map(itm, function(v){return "'"+v+"'"}).toString() %>
 # ## *<%= itm.name %>*
 # <%= itm.description %>
 task '<%= itm.name %>', '<%= itm.description %>', (options, callback)-> <%= itm.name.replace(/:/g, '_') %> options, <%= itm.init_callback || 'callback' %>
-<%= itm.name.replace(/:/g, '_') %> = (options, callback)->
-	async.series [
-		((step_callback)=>
-	 		<%= (itm.body || "").replace( /\n/g, "\n\t\t" )  || "# invocations" %>
-	 	),
+<%= itm.name.replace(/:/g, '_') %> = (options, success)->
+	async.series (
+		'<%= itm.name %>': ((callback)=>
+	 		<%= (itm.body || "").replace( /\n/g, "\n\t\t" )  || "callback null" %>
+	 	)<%= !itm.final && itm.invocations.length ? ',' : '' %>
+	 	<% if (!itm.final) { %>
 		<% _.each(itm.invocations, function(v,k) { %>
-		((step_callback)=>
+		'<%= v.callee %>': ((<%= (v.callback != null) ? 't_callback' : 'callback' %>)=>
 			# Following lines from `<%= v.callee %>`
+			<% if (v.callback) { %>callback = (=> <%= v.callback %> t_callback)<% } %>
 			<%= (v.body || "").replace( /\n/g, "\n\t\t" )  %>
-		),
+		)<%= (k < itm.invocations.length - 1) ? ',' : '' %>
 		<% }); %>
-		((step_callback)=>
-			callback?()
-			step_callback null
-		)
-	]
+		<% } %>
+	), (e,data)=> success? e, data
 <% }); %>
 
 # Begin Templates

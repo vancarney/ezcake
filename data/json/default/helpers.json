@@ -33,6 +33,6 @@
       "options=[]", 
       "callback"
     ],
-    "body": "cmd = which(cmd) if which\n  app = child_process.spawn cmd, options\n  app.stdout.pipe(process.stdout)\n  app.stderr.pipe(process.stderr)\n  app.on 'exit', (status) -> callback?() if status is 0"
+    "body": "cmd = which(cmd) if which?\n  app = child_process.spawn cmd, options\n  app.stdout.pipe(process.stdout)\n  app.stderr.pipe(process.stderr)\n  app.on 'exit', (status) -> callback?() if status is 0"
   }
 ]

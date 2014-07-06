@@ -1,6 +1,3 @@
 [
-  ["-s", "--string [STRING]", "pass string as task param"],
-  ["-d", "--data [DATA]", "pass data object as task param"],
-  ["-p", "--path [PATH]", "pass path as task param"],
-  ["-o", "--out [FILENAME]", "pass filename for output"]
+  ["-s", "--string [STRING]", "pass string as task param"]
 ]

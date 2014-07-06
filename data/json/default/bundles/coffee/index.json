@@ -1,0 +1,7 @@
+{
+  "name":"coffee",
+  "command": [
+    "-0, --no-coffee",
+    "do not use coffee-script (js only)"
+  ]
+}

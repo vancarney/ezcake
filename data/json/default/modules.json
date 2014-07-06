@@ -1,24 +1,11 @@
 [
   {
-    "name": "coffee",
-    "description": "Enable coffee-script compiling",
-    "ext": "coffee",
+    "name": "fs-extra",
+    "description": "use fs-extra for File System functions",
     "installer": "npm",
-    "installer_options": {"alias":"coffee-script", "version":"1.7.1"},
-    "paths": [
-      ".",
-      "src/coffee"
-    ],
-    "callback": "coffeeCallback",
     "command": [
-      "-0, --no-coffee",
-      "don't use coffee-script (js only)"
-    ],
-    "invocations": [
-      {
-        "call": "onBuild",
-        "body": "launch 'coffee', (['-c', '-b', '-l', '-o' ].concat paths.coffee), @onCoffeeCallback()"
-      }
+      "-X, --no-fsextra",
+      "do not use fs-extra"
     ]
   }
 ]

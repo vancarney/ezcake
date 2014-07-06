@@ -1,6 +1,6 @@
 class NPMPackage
-  constructor:(path)->
-    @pkgPath = "#{path}/package.json"
+  constructor:(p)->
+    @pkgPath = path.normalize "#{p}/package.json"
   loadNPMPackage: (callback)->
     if @pkgData?
       callback null, @pkgData

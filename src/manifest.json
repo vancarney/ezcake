@@ -7,8 +7,10 @@
     "src/coffee/config_loader.coffee",
     "src/coffee/npm_package.coffee",
     "src/coffee/processor.coffee",
+    "src/coffee/file_helpers.coffee",
     "src/coffee/cakefile_renderer.coffee",
     "src/coffee/logging.coffee",
+    "src/coffee/utils.coffee",
     "src/coffee/invoke.coffee"
   ]
 }

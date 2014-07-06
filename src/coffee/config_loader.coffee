@@ -8,8 +8,9 @@ class ConfigLoader
   #### LoadConfig(path)
   # Loads Configuration at given path and processes it's Directives
   loadConfig: (p, cB)->
-    fs.exists p, (bool)=>
-      return @warn "config file #{p} was not found" if !bool
+    p = process.cwd() if p == '.'  
+    fs.exists (p = path.normalize p), (bool)=>
+      return ezcake.warn "config file #{p} was not found" if !bool
       addPath = p.split(path.sep).pop()
       # import data from file
       callBack = (d)=>
@@ -17,10 +18,13 @@ class ConfigLoader
           @__loader.require_tree.loadedConfigs.push addPath 
         else
           @__loader.require_tree.loadedConfigs = [addPath]
-        @__loader.require_tree.off 'changed' 
+        @__loader.require_tree.off 'changed'
         cB()
       @__loader.require_tree.on 'changed', callBack
-      @__loader.require_tree.addTree p
+      try
+        return @__loader.require_tree.addTree p
+      catch e
+        ezcake.error "Failed to load config file '#{p}'. [#{e}]"
   extendConfigurations: ->
     _.each @__config.configurations, (v,k)=>
       @__config.configurations[k] = _.extend _.clone(x), v if v.inherits? and (x = _.findWhere @__config.configurations, name:v.inherits)?
@@ -33,6 +37,7 @@ class ConfigLoader
         bundles: _.filter @__config.bundles, (o)=> _.contains c.bundles, o.name
         modules: _.filter @__config.modules, (o)=> _.contains c.modules, o.name 
         tasks: _.filter @__config.tasks, (o)=> _.contains c.tasks, o.name
+        options: @__config.options
         declarations: @__config.declarations
         helpers: @__config.helpers
     catch e

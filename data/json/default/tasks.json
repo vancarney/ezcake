@@ -5,21 +5,16 @@
   },
   {
     "name": "build:release",
+    "requires":[{"name":"fs-extra", "varname":"fs"}],
     "description": "Copy contents of debug to web release folder and minify",
     "paths": [
       "debug",
       "www"
     ],
-    "body": "exec \"cp -r #{paths.release[0]} #{paths.release[1]}\" if paths?.release"
+    "body": "build options, =>\n  if paths?['build:release'].length >= 2\n    fs.copy paths['build:release'][0], paths['build:release'][1], null, callback\n  else\n    callback 'paths[build:release] was missing or malformed'"
   },
   {
     "name": "watch",
     "description": "watch project src folders and build on change"
-  },
-  {
-    "name":"coffee:eval",
-     "description":"outputs coffee-script string as compiled javascript",
-     "init_callback":"(e,sOut,sErr)-> console.log sOut || sErr",
-     "body":"exec \"echo '#{options.string}' | coffee -s -p\", null, callback"
   }
 ]

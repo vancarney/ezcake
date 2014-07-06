@@ -111,7 +111,7 @@ option '-s', '--string [COFFEE_STRING]', 'pass string as task param'
 option '-a', '--arr [ARRAY]', 'pass array as task param'
 task 'coffee:eval', 'outputs coffee-script string as compiled javascript', (options, callback)-> coffee_eval options, (e,sOut,sErr)-> console.log sOut || sErr
 coffee_eval = (options, callback)->
-  console.log options.arr.toString()
+  console.log "echo '#{options.string}' | coffee -s -p"
   exec "echo '#{options.string}' | coffee -s -p", null, callback
 
 
@@ -252,11 +252,15 @@ mocha = (options, callback) ->
   if typeof options is 'function'
     callback = options
     options = []
-  # add coffee directive
-  options.push '--compilers'
-  options.push 'coffee:coffee-script'
-  
-  launch 'mocha', options, callback
+    # add coffee directive
+    options.push '--compilers'
+    options.push 'coffee:coffee-script/register'
+    options.push '--reporter'
+    options.push 'spec'
+    # options.push '-g'
+    # options.push 'Query+'
+    console.log options.join ' '
+    launch 'mocha', options, callback
 
 # ## *docco*
 #

@@ -1,39 +1,62 @@
+## Processor
+# Utilities to process Configuration Data
 class Processor
   constructor:(@selectedConfig)->
   hasDependencies: ->
-    has = _.every _.flatten(_.pluck @selectedConfig,  "required"), (val)=>
-      (_.find (_.pluck _.extend( {}, @declarations, @helpers, @selectedConfig.modules), "name"), (n)=>
-        n == val
-      ) || false
-    throw new Error "'#{val}' was required but not found" if not has
-    true
+    delete (config = _.clone @selectedConfig).options
+    missing = []
+    _.each _.flatten(_.compact(_.pluck _.compact( _.flatten config ),  'dependencies')), (val,key)=>
+      missing.push val.name if !(_.findWhere _.compact( _.flatten config ), name:val.name)
+    if missing.length then missing else false
+  ## getModCommands
+  # returns concatenated array of Modules and Commands
   getModCommands: -> @selectedConfig.modules.concat @selectedConfig.commands
+  ## getRequires
+  # returns array of Required Software Packages
   getRequires: ->
+    # _.compact(_.pluck(@getModCommands().concat(@selectedConfig.tasks, @selectedConfig.helpers), 'requires')
     arr = _.flatten _.compact _.map @selectedConfig, (v)=> if (a = _.compact _.pluck v, 'requires').length then a else null
     _.map (_.reject arr, (obj,key,list) =>
       # return compacted test results
-      _.compact( _.map list.slice(key+1, list.length), (v,k) => true if _.isEqual obj, v).length > 0
+      !(ezcake.utils.is_intrinsic obj.name) or _.compact( _.map list.slice(key+1, list.length), (v,k) => true if _.isEqual obj, v).length > 0
     ), (o) =>     
       # set type to NPM if not defined
       o.type ?= 'npm'
       o
+  ## getDependencies
+  # returns array of Required EzCake Elements
   getDependencies: ->
-    _.map @selectedConfig.modules, (v,k)->
+    _.compact _.map @selectedConfig.modules, (v,k)->
+      name = v.installer_options?.alias || v.name
+      return null if (!v.installer or v.installer == 'npm') and ezcake.utils.is_intrinsic name
       {
         type: v.installer || 'npm'
-        name: v.installer_options?.alias || v.name
+        name: name
         version: v.installer_options?.version || '*'
         development: v.installer_options?.development || false
       }
-  getPaths: (data)-> 
+  ## getPaths
+  # returns Paths to be created in project
+  getPaths: -> 
     paths = {}
-    _.each data, (v,k)-> 
+    _.each (@getModCommands().concat @selectedConfig.tasks), (v,k)->
       paths[v.name] = v.paths if v.paths?
-    JSON.stringify paths, null, 2
+    paths
+  getFiles: ->
+    files = {}
+    _.each @getModCommands(), (v,k)->
+      files[v.name] = v.files if v.files?
+    files
+  ## getExts
+  # returns defined file extensions for change monitoring
   getExts: ->
     (_.compact _.pluck @selectedConfig.modules, 'ext').join '|'
+  ## getInvocations
+  # returns array of Command Invocations
   getInvocations: ->
     _.filter @getModCommands(), (o)-> o.invocations?
+  ## getCallbacks
+  # returns array of defined feature-specific CallBacks
   getCallbacks: ->
     mC = @getModCommands()
     callbacks = []
@@ -45,6 +68,8 @@ class Processor
         _.each _.filter(fV.invocations, (o)=> o.call == v.name), (iV,iK)=>
           callbacks[k].invocations.push callee:fV.name, body:iV.body
     callbacks
+  ## processTasks
+  # combines defined commands to be performed in task body
   processTasks: ->
     m = @getInvocations()
     _.each @selectedConfig.tasks, (v,k)=> 
@@ -52,33 +77,44 @@ class Processor
       @selectedConfig.tasks[k].invocations = []
       _.each m, (fV,fK)=>
         _.each _.filter(fV.invocations, (o)=> o.call == name), (iV,iK)=>
-          @selectedConfig.tasks[k].invocations.push callee:fV.name, body:iV.body if iV.body.length
+          callback = "on#{fV.callback.charAt(0).toUpperCase()}#{fV.callback.slice 1}" if fV.callback
+          @selectedConfig.tasks[k].invocations.push callee:fV.name, body:iV.body, callback:callback || null if iV.body.length
+  ## getDeclarations
+  # combines defined commands to be performed in task body
   getDeclarations: ->
     src = ""
     _.each @selectedConfig.declarations, (v,k)=>
-     src = "#{src}\n\n#{@template (path.join @module_path, 'templates/_declaration.template.txt'), v}"
-     # console.log "src: #{src}"
+      src = "#{src}\n\n#{@template (path.join @module_path, 'templates/_declaration.template.txt'), v}"
     src
-  getHelpers: ->
-    (_.map ezcake.CONFIG.default.helpers, (v,k)=>
-      @template "#{path.join @module_path, 'templates/_helper.template.txt'}", v
-    ).join "\n"
-
+  ## generateConfiguration
+  # returns Object ready for insertion into Cakefile template
   generateConfiguration:->
     if (bundles = @selectedConfig.bundles)?
       _.each bundles, (v,k)=>
+        console.log "bundle name: #{v.name}"
         if cmd[v.name]
           _.each v, (bV, bK) =>
-            if bK != 'templates' 
-              selected[bK] = _.union( selected[bK] || [], bV) if _.isObject bV 
-            else
-              (m = {})[v.name] = bV
-              selected[bK] = _.extend( selected[bK] || {}, m ) if _.isObject bV
+            console.log "bK: #{bK}"
+            if !(typeof bV == 'string')
+              if bK != 'templates'
+                console.log "bK: #{bK}"
+                @selectedConfig[bK] ?= []
+                if _.isArray bV
+                  _.each bV, (nV,nK) => @selectedConfig[bK].push nV if nV.name? and nV.name != ""
+                else
+                  if ezcake.utils.is_config_element bK
+                    _.each bV, (nV,nK) => @selectedConfig[bK].push nV if nV.name? and nV.name != ""
+                  else
+                     @selectedConfig[bK].push bV if bV.name? and bV.name != ""
+              else
+                (m = {})[v.name] = bV
+                @selectedConfig[bK] = _.extend( @selectedConfig[bK] || {}, m ) if _.isObject bV
     @processTasks()
+    ezcake.error "missing the following dependiences: #{deps}" if deps = @hasDependencies()
     _.extend @selectedConfig, {
       reqs: (reqs = _.where @getRequires(), type:'npm')
       version: @version
-      paths:@getPaths @getModCommands()
+      paths:@getPaths()
       exts: @getExts()
       callbacks: @getCallbacks()
       options: @selectedConfig.options || []

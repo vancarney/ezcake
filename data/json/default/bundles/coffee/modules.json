@@ -1,0 +1,14 @@
+[
+  {
+    "name": "coffee",
+    "description": "Enable coffee-script compiling",
+    "ext": "coffee",
+    "installer": "npm",
+    "installer_options": {"alias":"coffee-script", "version":"1.7.1"},
+    "paths": [
+      ".",
+      "src/coffee"
+    ],
+    "callback": "coffeeCallback"
+  }
+]

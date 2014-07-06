@@ -1,0 +1,55 @@
+{
+  "name": "custom-web",
+  "description": "Customized Version of Web Configuration",
+  "commands": [
+    "assets",
+    "noJST"
+  ],
+  "modules": [
+    "coffee",
+    "jade",
+    "scss",
+    "compass",
+    "jst",
+    "uglifyjs"
+  ],
+  "tasks": [
+    "build",
+    "build:release",
+    "watch"
+  ],
+  "files": "README.md",
+  "paths": {
+    "release": [
+      "debug",
+      "www"
+    ],
+    "assets": [
+      "src/assets",
+      "debug"
+    ],
+    "coffee": [
+      "debug/js",
+      "src/coffee"
+    ],
+    "uglify": [
+      "www"
+    ],
+    "jade": [
+      "src/jade",
+      "debug",
+      "src/jade/templates",
+      "src/jade/include"
+    ],
+    "jst": [
+      "src/jst",
+      "debug/js"
+    ]
+  },
+  "invocations": [
+    {
+      "call": "onBuild:release",
+      "body": "minify()"
+    }
+  ]
+}

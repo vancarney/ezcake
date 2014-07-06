@@ -1,0 +1,13 @@
+[
+  {
+    "name":"coffee:eval",
+    "final":true,
+    "description":"Utility function that outputs coffee-script string as compiled javascript",
+    "init_callback":"(e,data)=> console.log data['coffee:eval'] if data?",
+    "body":"child_process.exec \"echo '#{options.string}' | coffee -s -p\", null, (e,sOut,sErr) => callback sErr, sOut"
+  },
+  {
+    "name":"coffee:create:file",
+    "body":""
+  }
+]
